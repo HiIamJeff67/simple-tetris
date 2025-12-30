@@ -1,5 +1,17 @@
-enum PieceType: CaseIterable {
+enum PieceType: CaseIterable, Sendable {
     case I, O, T, S, Z, J, L
+}
+
+extension PieceType: Equatable { // force to tell swift this comparasion is NOT relate to any actor action
+    nonisolated static func == (lhs: PieceType, rhs: PieceType) -> Bool {
+        switch (lhs, rhs) {
+        case (.I,.I), (.O,.O), (.T,.T),
+             (.S,.S), (.Z,.Z), (.J,.J), (.L,.L):
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 extension PieceType {
