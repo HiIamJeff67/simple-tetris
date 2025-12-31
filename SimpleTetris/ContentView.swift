@@ -16,4 +16,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(SettingsViewModel())
+        .modelContainer(for: [ScoreModel.self])
 }

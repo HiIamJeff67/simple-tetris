@@ -5,5 +5,6 @@ struct GameContent {
     var board: [[BlockColor?]] = Array(repeating: Array(repeating: nil, count: 10), count: 20)
     var score: Int = 0
     var currentPiece: Piece? = nil
+    var pieceQueue: [Piece] = []
     var isGameOver: Bool = false
 }

@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		1FF2B22E2F02645300EAE025 /* SimpleTetris */ = {
+		1FBB4B572F04E18C003220BA /* SimpleTetris */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = SimpleTetris;
 			sourceTree = "<group>";
@@ -32,8 +32,8 @@
 		1FF2B2232F02645300EAE025 = {
 			isa = PBXGroup;
 			children = (
-				1FF2B22E2F02645300EAE025 /* SimpleTetris */,
 				1FF2B22D2F02645300EAE025 /* Products */,
+				1FBB4B572F04E18C003220BA /* SimpleTetris */,
 			);
 			sourceTree = "<group>";
 		};
@@ -61,7 +61,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				1FF2B22E2F02645300EAE025 /* SimpleTetris */,
+				1FBB4B572F04E18C003220BA /* SimpleTetris */,
 			);
 			name = SimpleTetris;
 			packageProductDependencies = (

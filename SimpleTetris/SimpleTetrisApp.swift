@@ -7,6 +7,5 @@ struct SimpleTetrisApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: [ScoreModel.self])
     }
 }

@@ -359,6 +359,7 @@ actor GameEngine {
             board: self.board,
             score: self.currentScore,
             currentPiece: self.currentPiece,
+            pieceQueue: self.pieceQueue,
             isGameOver: false
         )
     }

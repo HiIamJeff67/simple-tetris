@@ -7,7 +7,23 @@ struct GameView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var vm: GameViewModel = GameViewModel()
     @State private var hasGameStarted = false
-    @State private var isAccelerating = false
+    @State private var fastDropTask: Task<Void, Never>?
+    
+    private func startFastDrop() {
+        guard fastDropTask == nil else { return }
+
+        fastDropTask = Task {
+            while !Task.isCancelled {
+                vm.moveDown()
+                try? await Task.sleep(nanoseconds: 50_000_000)
+            }
+        }
+    }
+
+    private func stopFastDrop() {
+        fastDropTask?.cancel()
+        fastDropTask = nil
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -18,7 +34,7 @@ struct GameView: View {
             let boardHeight = cellSize * CGFloat(boardRows)
             
             ZStack {
-                VStack(spacing: 0) {
+                VStack (spacing: 0) {
                     ForEach(0..<boardRows, id: \.self) { y in
                         HStack(spacing: 0) {
                             ForEach(0..<boardCols, id: \.self) { x in
@@ -29,9 +45,8 @@ struct GameView: View {
                             }
                         }
                     }
-                }
+                } // end of VStack
                 .frame(width: boardWidth, height: boardHeight)
-                .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 .zIndex(0)
                 .gesture(
                     DragGesture(minimumDistance: 20)
@@ -43,12 +58,6 @@ struct GameView: View {
                                     vm.moveLeft()
                                 }
                             }
-                        }
-                )
-                .simultaneousGesture(
-                    LongPressGesture(minimumDuration: 0.2)
-                        .onEnded { _ in
-                            vm.moveDown()
                         }
                 )
                 .simultaneousGesture(
@@ -107,70 +116,69 @@ struct GameView: View {
                         .cornerRadius(24)
                         .shadow(radius: 12)
                     }
-                }
+                } // end of Group
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .zIndex(1)
-            }
-        }
+                
+                LongPressOverlay(
+                    onBegan: startFastDrop,
+                    onEnded: stopFastDrop
+                ) // end of LongPressOverlay
+            } // end of ZStack
+            .overlay(
+                PieceQueueView(pieces: vm.gameContent.pieceQueue)
+                    .frame(width: 80, height: 160)
+                    .padding(.top, 36)
+                    .padding(.trailing, 12),
+                alignment: .topTrailing
+            )
+        } // end of GeometryReader
         .navigationTitle("")
         .navigationBarBackButtonHidden(true)
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                HStack(spacing: 16) {
-                    Button(action: { dismiss() }) {
-                        HStack {
-                            Image(systemName: "chevron.left")
-                            Text("返回")
-                        }
-                    }
-                    
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { dismiss() }) {
                     HStack {
-                        Image(systemName: "clock")
-                            .foregroundColor(.blue)
-                        Text(timeString(from: vm.elapsedTime))
-                            .font(.headline)
-                            .foregroundColor(.blue)
+                        Image(systemName: "chevron.left")
+                        Text("返回")
                     }
-                    .padding(8)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(12)
-                    
-                    HStack {
-                        Image(systemName: "star.fill")
-                            .foregroundColor(.orange)
-                        Text("\(vm.currentScore)")
-                            .font(.headline)
-                            .foregroundColor(.orange)
-                    }
-                    .padding(8)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(12)
                 }
             }
-        }
+            ToolbarItem(placement: .principal) {
+                HStack {
+                    Image(systemName: "clock")
+                    Text(getTimeString(from: vm.elapsedTime))
+                }
+                .padding(8)
+                .background(.ultraThinMaterial)
+                .cornerRadius(12)
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack {
+                    Image(systemName: "star.fill")
+                    Text("\(vm.currentScore)")
+                }
+                .padding(8)
+                .background(.ultraThinMaterial)
+                .cornerRadius(12)
+            }
+        } // end of toolbar
         .onAppear {
             vm.modelContext = modelContext
-        }
+        } // end of onAppear
         .task {
             await vm.initialize(
                 settings: settingsViewModel.settings,
                 modelContext: modelContext
             )
-        }
+        } // end of task
         .onDisappear {
             vm.stopGameLoop()
-        }
+        } // end of onDisapear
         .onChange(of: vm.isGameOver) { _, newValue in
             if newValue && hasGameStarted {
                 vm.saveScore()
             }
-        }
-    }
-
-    private func timeString(from interval: TimeInterval) -> String {
-        let totalSeconds = Int(interval)
-        let minutes = totalSeconds / 60
-        let seconds = totalSeconds % 60
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
-}
+        } // end of onChange
+    } // end of body
+} // end of GameView
