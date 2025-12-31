@@ -1,10 +1,10 @@
 struct SettingsModel {
-    var width: Int = 6
-    var height: Int = 12
-    var fallingSpeedMultiplier: Double = 1.5
-    var backgroundStyle: BackgroundStyle = .classic
-    
-    init(width: Int, height: Int, fallingSpeedMultiplier: Double, backgroundStyle: BackgroundStyle) {
+    var width: Int
+    var height: Int
+    var fallingSpeedMultiplier: Double
+    var backgroundStyle: BackgroundStyle
+
+    init(width: Int = 6, height: Int = 12, fallingSpeedMultiplier: Double = 1.5, backgroundStyle: BackgroundStyle = .classic) {
         self.width = min(MaxWidth, max(MinWidth, width))
         self.height = min(MaxHeight, max(MinHeight, height))
         self.fallingSpeedMultiplier = min(MaxFallingSpeedMultiplier, max(MinFallingSpeedMultiplier, fallingSpeedMultiplier))
